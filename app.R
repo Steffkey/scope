@@ -65,22 +65,38 @@ ui <- fluidPage(
       fluidRow(
         #  class = "row",
         column(width = 3, class = "column",
-        materialSwitch("descript", label = "Show descriptions", value = TRUE, status = "primary", right = FALSE),
-        tags$p(actionLink("browse", "Browse examples")),
-
-        tags$br(),
-
-        div(class = "flex-container",
-            radioButtons('format', 'Export as:', c('PDF', 'XML', 'Word'), inline = TRUE),
-            downloadButton("report", label = "", class = "download-btn", onclick = "document.getElementById('state').click()"),
-            downloadButton("state", label = "",  style = "opacity: 0; position: fixed; pointer-events:none;")
-        ),
-
-        br(),
-
-        div(class = "flex-container",
-            fileInput("uploadFile", "Upload Previous State")
-        )
+               
+               materialSwitch(inputId = "descript", label = "Show descriptions", value = TRUE, status = "primary", right = FALSE),
+               tags$p(actionLink(inputId = "browse", label = "Browse examples")),
+               
+               br(), br(),
+               
+               div( # icon + text that explains the export options 
+                 class = "icon-paragraph",
+                 tags$i(id = "export_icon", class = "fa-solid fa-circle-question question_icon", style = "cursor: pointer;", 
+                        `data-tooltip` = "Select PDF for your final report and Word if you want to edit your file offline."),
+                 strong("Export your inputs:")
+               ), 
+               
+               div(
+                  class = "export-import-container", 
+                  radioButtons(inputId = 'format', label = '', choices = c('PDF', 'Word'), selected = "PDF", inline = TRUE),
+                  downloadButton("report", label = "", class = "download-btn", onclick = "document.getElementById('state').click()"),
+                  downloadButton("state", label = "",  style = "opacity: 0; position: fixed; pointer-events:none;")
+               ),
+               
+               br(), br(),
+               
+               div( # icon + text that explains the upload/import function 
+                 class = "icon-paragraph",
+                 tags$i(id = "upload_icon", class = "fa-solid fa-circle-question question_icon", style = "cursor: pointer;", 
+                        `data-tooltip` = "Each time you export your inputs, an .rds file will also be exported. Upload this .rds file here to continue working on your protocol."),
+                 strong("Import Previous State (.rds file):")
+               ), 
+               
+               div(class = "export-import-container",
+                   fileInput("uploadFile", "")
+               )
       ),
 
       column(width = 9, class = "column",
@@ -159,7 +175,7 @@ server <- function(input, output, session) {
   
   # Render the initial mainPanel
   output$scope_panel <- renderUI({
-    generate_scope_panel(scope_sheets, scope_items)
+    generate_scope_panel(temp_sheets, temp_items)
   })
   
   # Function to handle uploaded file
@@ -205,7 +221,7 @@ server <- function(input, output, session) {
       
       # Update the mainPanel with new data
       output$scope_panel <- renderUI({
-        generate_scope_panel(scope_sheets, modified_items)
+        generate_scope_panel(temp_sheets, modified_items)
       })
       
     }
@@ -263,12 +279,12 @@ server <- function(input, output, session) {
   # Observe the selected tab in the navlistPanel and update current_tab accordingly
   observeEvent(input$scope_panel, { # observe which tab is active
     #  print(input$scope_panel) # for debugging
-    current_tab(match(input$scope_panel, scope_sheets)) # find out the index of the current tab
+    current_tab(match(input$scope_panel, temp_sheets)) # find out the index of the current tab
     #  print(current_tab()) # for debugging
   })
   
   # Set up observer for next button using lapply
-  lapply(1:length(scope_sheets), function(i) {
+  lapply(1:length(temp_sheets), function(i) {
     observeEvent(input[[paste0("next", i)]], {
       current_tab(current_tab() + 1) # increase index if button is clicked
       #  print(current_tab()) # for debugging
@@ -276,7 +292,7 @@ server <- function(input, output, session) {
   })
   
   # Set up observer for previous button using lapply
-  lapply(1:length(scope_sheets), function(i) {
+  lapply(1:length(temp_sheets), function(i) {
     observeEvent(input[[paste0("previous", i)]], {
       current_tab(current_tab() - 1) # decrease index if button is clicked
       #  print(current_tab()) # for debugging
@@ -285,7 +301,7 @@ server <- function(input, output, session) {
   
   # Update the selected tab based on the current_tab value
   observe({
-    updateTabsetPanel(session, "scope_panel", selected = scope_sheets[current_tab()]) # generalize for all templates and sheets
+    updateTabsetPanel(session, "scope_panel", selected = temp_sheets[current_tab()]) # generalize for all templates and sheets
     session$sendCustomMessage(type = "scrollTop", message = list())
   })
   
