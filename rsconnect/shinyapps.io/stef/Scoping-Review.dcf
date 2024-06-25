@@ -1,0 +1,13 @@
+name: Scoping-Review
+title: Scoping-Review
+username: stef
+account: stef
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12209112
+bundleId: 8766526
+url: https://stef.shinyapps.io/Scoping-Review/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: files/protocol-state-on-06-19-2024-12_14_46.rds|files/scope_icons1.RData|files/scope_icons2.RData|README.md|template/ScopingReview_1.xlsx

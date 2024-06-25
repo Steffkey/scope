@@ -8,14 +8,18 @@ library(shinydashboardPlus)
 library(shinyRadioMatrix)
 library(shinyWidgets)
 library(tinytex)
-#library(rsconnect) 
+library(rsconnect) 
 
 #### PREPARATIONS '#############################################################
 
 rm(list = ls()) # clear environment
-load("C:/Users/mueller_admin.ZPIDNB21/Documents/Desktop/Rprojects/Scoping-Review/files/scope_icons2.RData") # Load the processed data
-path = "C:/Users/mueller_admin.ZPIDNB21/Documents/Desktop/Rprojects/Scoping-Review/template/ScopingReview_2.xlsx" # set path to template excel
-source("C:/Users/mueller_admin.ZPIDNB21/Documents/Desktop/Rprojects/scripts/functionlibrary.R", local = TRUE) # get functions
+# load("C:/Users/mueller_admin.ZPIDNB21/Documents/Desktop/Rprojects/Scoping-Review/files/temp_scr2.RData") # Load the processed data
+# path = "C:/Users/mueller_admin.ZPIDNB21/Documents/Desktop/Rprojects/Scoping-Review/template/ScopingReview_2.xlsx" # set path to template excel
+# source("C:/Users/mueller_admin.ZPIDNB21/Documents/Desktop/Rprojects/scripts/functionlibrary.R", local = TRUE) # get functions
+
+load("temp_scr2.RData") # Load the processed data
+path = "ScopingReview_2.xlsx" # set path to template excel
+source("functionlibrary.R", local = TRUE) # get functions
 
 #### UI ########################################################################
 
@@ -120,9 +124,9 @@ ui <- fluidPage(
         p("Step 3: Submit your PDF to PsychArchives (https://pasa.psycharchives.org/)."),
         br(),
         p(strong("IMPORTANT:"), "Save your progress once in a while by clicking the ", strong("download button"), "that you will see on the left."),
-        p("In addition to the file format you selected, a ", strong(".rds file"), " will be downloaded. This is the most important file because it can be uploaded again later."),
+        p("In addition to the file format you selected, an ", strong(".rds file"), " will be downloaded. This is the most important file because it can be uploaded again later."),
         br(),
-        p("To begin, select “Template” in the drop-down menu on the upper left."),
+        p("To begin, switch from", em("Instructions"), " to ", em("Template"), "in the drop-down menu on the upper left."),
         br()
       )
     ),
@@ -194,20 +198,18 @@ server <- function(input, output, session) {
       # Update the counter reactive value
       counter(n)
       
-      ########################################## fill textinputs
-      sheets <- excel_sheets(path = path) #contains list of sheet names
-      
+      ########################################## fill items with user input
       # get user data (stored in params)
       
       # update excel
-      modified_sheets <- update_sheets_with_user_data(path, data) # data[[3]] = params[[3]]
+      modified_sheets <- update_sheets_with_user_data(temp_sheets, data) # data[[3]] = params[[3]]
       #save(modified_sheets, file = "show_modified_sheets3.RData")
       
       # set up list to store items of all sheets
       all_items <- list()
       
       # loop through modified sheets
-      for (m in seq_along(sheets))
+      for (m in seq_along(temp_sheets))
       {
         mylist <- items_sheet(modified_sheets[[m]])
         all_items <- append(all_items, list(mylist))          # list that contains items of one section
@@ -317,8 +319,16 @@ server <- function(input, output, session) {
       # Ensure counter is passed to generate_params
       params <- generate_params(input, counter()) # Pass counter() to the function
       
+      # Select appropriate params based on format
+      selected_params <- switch(
+        input$format,
+        XML = params$params_s,  
+        PDF = params$params_s,
+        Word = params$params_long
+      )
+      
       if (input$format == 'XML') {
-        xmldoc <- generate_xml(params)
+        xmldoc <- generate_xml(selected_params)
         # Save the XML content to the file
         xml2::write_xml(xmldoc, file)
       } else {
@@ -340,10 +350,9 @@ server <- function(input, output, session) {
                                        "--pdf-engine-opt=-dPDFSETTINGS=/prepress"
                                      )
                                    ), 
-                                   HTML = html_document(), 
                                    Word = word_document()
                                  ),
-                                 params = params,
+                                 params = selected_params,
                                  envir = new.env(parent = globalenv())
         )    
         file.rename(out, file)
@@ -355,10 +364,10 @@ server <- function(input, output, session) {
   output$state <- downloadHandler(
     filename = function() {
       paste0(create_statename(), ".rds")
-      },
+    },
     content = function(file) {
       params <- generate_params(input, counter())
-      saveRDS(params, file = file)
+      saveRDS(params$params_s, file = file)
     }
   )
   ##################### END print report and save params 
