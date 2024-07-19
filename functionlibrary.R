@@ -69,11 +69,9 @@ check_item_type <- function(tabpanel, i, bool_ex) {
                  box(
                    div(
                      class = "icon-paragraph",
-                     tags$i(id = tabpanel$icon_ids[i], class = "fas fa-info-circle info_icon", style = "cursor: pointer;", `data-tooltip` = tabpanel$resources[i]),
-                     #p(
-                     strong(
-                       tabpanel$head[i]
-                     )#)
+                     # if you don't want the info icons in your app, simply make the next line a comment
+                     #tags$i(id = tabpanel$icon_ids[i], class = "fas fa-info-circle info_icon", style = "cursor: pointer;", `data-tooltip` = tabpanel$resources[i]),
+                     strong(tabpanel$head[i])
                    ),
                    width = 8 #set this to e.g. 3 to display the headings on the left of the items/input fields
                  ),
@@ -86,8 +84,10 @@ check_item_type <- function(tabpanel, i, bool_ex) {
          }, #close none
          matrix2 = {
            m_options <- as.list(unlist(strsplit(as.character(tabpanel$options[i]), " tab ")))
-           item <- radioMatrixInput(inputId = tabpanel$id[i], rowIDs = c("analysis code", "experimental code",  "raw data", "processed data"),
-                                    rowLLabels = as.matrix(data.frame(l = c(":", ":", ":", ":"))),
+           #item <- radioMatrixInput(inputId = tabpanel$id[i], rowIDs = c("analysis code", "experimental code",  "raw data", "processed data"),
+           item <- radioMatrixInput(inputId = tabpanel$id[i], rowIDs = c("1", "2",  "3", "4"),
+                                    rowLLabels = as.matrix(data.frame(object = c("analysis code", "experimental code", "raw data", "processed data"))),
+                                    #rowLLabels = as.matrix(data.frame(l = c(":", ":", ":", ":"))),
                                     choices = m_options)
          }, #close matrix2
          stop("Unknown type found in row ", i) # If type is undefined, stop and print an error message
@@ -106,7 +106,7 @@ check_item_type <- function(tabpanel, i, bool_ex) {
             div(
               class = "icon-paragraph",
               # if you don't want the info icons in your app, simply make the next line a comment
-              #tags$i(id = tabpanel$icon_ids[i], class = "fas fa-info-circle info_icon", style = "cursor: pointer;", `data-tooltip` = tabpanel$resources[i]),
+             # tags$i(id = tabpanel$icon_ids[i], class = "fas fa-info-circle info_icon", style = "cursor: pointer;", `data-tooltip` = tabpanel$resources[i]),
               strong(tabpanel$head[i])
             ),
             #style = "border: 1px solid black; padding-top: 1em;",
@@ -318,7 +318,13 @@ generate_scope_panel <- function(temp_sheets, temp_items){
               tabPanel(temp_sheets[6],
                        temp_items[6],
                        actionButton("previous6", "Previous page"),
-                       #actionButton("next6", "Next page"), #die letzte Seite kriegt keinen Next-Button,
+                       actionButton("next6", "Next page"),
+                       
+              ),
+              tabPanel(temp_sheets[7],
+                       temp_items[7],
+                       actionButton("previous7", "Previous page"),
+                       #actionButton("next7", "Next page"), #die letzte Seite kriegt keinen Next-Button,
                        
               )
   ) # end SCOPE QUANT panel
@@ -482,7 +488,7 @@ create_statename <- function(){ # first contributor can be found in params[[1]][
   only_date <- format(current_time, "%m-%d-%Y") # add formatting
   
   # create spreadsheetname and code
-  statename <- paste0("protocol-state-on-", date_time) # e.g. "intermediate-state-on-05-16-2024-10:12:40"
+  statename <- date_time #paste0("state-on-", date_time) # e.g. "intermediate-state-on-05-16-2024-10:12:40"
   
   return(statename)
 }
