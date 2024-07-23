@@ -17,8 +17,8 @@ rm(list = ls()) # clear environment
 # path = "C:/Users/mueller_admin.ZPIDNB21/Documents/Desktop/Rprojects/Scoping-Review/template/ScopingReview_2.xlsx" # set path to template excel
 # source("C:/Users/mueller_admin.ZPIDNB21/Documents/Desktop/Rprojects/scripts/functionlibrary.R", local = TRUE) # get functions
 
-load("temp_scr5.RData") # Load the processed data
-path = "ScopingReview_3.xlsx" # set path to template excel
+load("temp_scr7.RData") # Load the processed data
+path = "ScopingReview_4.xlsx" # set path to template excel
 source("functionlibrary.R", local = TRUE) # get functions
 
 #### UI ########################################################################
