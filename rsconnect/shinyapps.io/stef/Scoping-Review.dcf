@@ -5,9 +5,9 @@ account: stef
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 12209112
-bundleId: 8896458
+bundleId: 9459802
 url: https://stef.shinyapps.io/Scoping-Review/
 version: 1
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: README.md|ScopingReview_3.xlsx|temp_scr5.RData|temp_scr6.RData|template/ScopingReview_1.xlsx|files
+ignoredFiles: new_modified_items.RData|README.md|scope3.zip|show_modified_sheets3.RData|old
